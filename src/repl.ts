@@ -1,5 +1,6 @@
-import { exit } from "process";
+// import { exit } from "process";
 import readline from "readline";
+import { getCommands } from "./commands.js";
 
 export function cleanInput(input: string): string[] {
   const split_text = input.split(" ");
@@ -20,12 +21,22 @@ export function startREPL() {
   });
 
   rl.prompt();
+  let cleaned_input: string[] = [];
   rl.on("line", (input) => {
-    const cleaned_input = cleanInput(input);
-    if (!input) {
-      rl.prompt();
-      exit();
+    cleaned_input = cleanInput(input);
+    const commands = getCommands();
+    const commandName = cleaned_input[0];
+    const command = commands[commandName];
+    if (command) {
+      try {
+        command.callback(commands);
+        rl.prompt();
+      } catch (err) {
+        console.log(err);
+        rl.prompt();
+      }
+    } else {
+      console.log("Unknown command");
     }
-    console.log(`Your command was: ${cleaned_input[0]}`);
   });
 }
