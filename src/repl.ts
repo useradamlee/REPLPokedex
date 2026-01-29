@@ -12,25 +12,26 @@ export function cleanInput(input: string): string[] {
   return cleaned_text;
 }
 
-export function startREPL() {
+export async function startREPL() {
   const state = initState();
 
   state.readline.prompt();
+
   let cleaned_input: string[] = [];
-  state.readline.on("line", (input) => {
+
+  state.readline.on("line", async (input) => {
     cleaned_input = cleanInput(input);
     const commandName = cleaned_input[0];
     const command = state.commands[commandName];
     if (command) {
       try {
-        command.callback(state);
-        state.readline.prompt();
+        await command.callback(state);
       } catch (err) {
         console.log(err);
-        state.readline.prompt();
       }
     } else {
       console.log("Unknown command");
     }
+    state.readline.prompt();
   });
 }
