@@ -24,7 +24,7 @@ export class PokeAPI {
   }
 
   async fetchLocation(locationName: string): Promise<Location> {
-    const fullURL = `${PokeAPI.baseURL}/location/${locationName}/`;
+    const fullURL = `${PokeAPI.baseURL}/location-area/${locationName}/`;
     const data: Promise<Location> = this.#pokeCache.get(fullURL);
     if (data != undefined) {
       return data;
@@ -36,6 +36,21 @@ export class PokeAPI {
     const location_data: Promise<Location> = await response.json();
     this.#pokeCache.add(fullURL, location_data);
     return location_data;
+  }
+
+  async fetchPokemon(PokemonName: string): Promise<Pokemon> {
+    const fullURL = `${PokeAPI.baseURL}/pokemon/${PokemonName}/`;
+    const data: Promise<Pokemon> = this.#pokeCache.get(fullURL);
+    if (data != undefined) {
+      return data;
+    }
+    const response = await fetch(fullURL, {
+      method: "GET",
+      mode: "cors",
+    });
+    const PokemonData: Promise<Pokemon> = await response.json();
+    this.#pokeCache.add(fullURL, PokemonData);
+    return PokemonData;
   }
 }
 
@@ -50,10 +65,33 @@ export type ShallowLocations = {
 };
 
 export type Location = {
-  id: number;
   name: string;
-  region: {
-    name: string;
-    url: string;
-  };
+  pokemon_encounters: {
+    pokemon: {
+      name: string;
+      url: string;
+    };
+  }[];
+};
+
+export type Pokemon = {
+  name: string;
+  base_experience: number;
+  height: number;
+  weight: number;
+  stats: {
+    base_stat: number;
+    effort: number;
+    stat: {
+      name: string;
+      url: string;
+    };
+  }[];
+  types: {
+    slot: number;
+    type: {
+      name: string;
+      url: string;
+    };
+  }[];
 };

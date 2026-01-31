@@ -3,18 +3,22 @@ import { commandExit } from "./command_exit.js";
 import { commandHelp } from "./command_help.js";
 import { commandMap } from "./command_map.js";
 import { commandMapb } from "./command_mapb.js";
-import { PokeAPI } from "./pokeapi.js";
+import { commandExplore } from "./command_explore.js";
+import { commandCatch } from "./command_catch.js";
+import { PokeAPI, Pokemon } from "./pokeapi.js";
+import { stat } from "fs/promises";
 
 export type CLICommand = {
   name: string;
   description: string;
-  callback: (state: State) => Promise<void>;
+  callback: (state: State, ...args: string[]) => Promise<void>;
 };
 
 export type State = {
   readline: Interface;
   commands: Record<string, CLICommand>;
   pokiapi: PokeAPI;
+  pokedex: Record<string, Pokemon>;
   nextLocationsURL: string | undefined;
   prevLocationsURL: string | undefined;
 };
@@ -49,6 +53,20 @@ export function getCommands(): Record<string, CLICommand> {
         commandMapb(state);
       },
     },
+    explore: {
+      name: "explore",
+      description: "Explores a certain specified location",
+      callback: async (state: State, ...args: string[]): Promise<void> => {
+        commandExplore(state, ...args);
+      },
+    },
+    catch: {
+      name: "catch",
+      description: "Catch a specified pokemon",
+      callback: async (state: State, ...args: string[]): Promise<void> => {
+        commandCatch(state, ...args);
+      },
+    },
   };
 }
 
@@ -62,6 +80,7 @@ export function initState(): State {
     readline: rl,
     commands: getCommands(),
     pokiapi: new PokeAPI(50000),
+    pokedex: {},
     nextLocationsURL: undefined,
     prevLocationsURL: undefined,
   };
