@@ -6,6 +6,7 @@ import { commandMapb } from "./command_mapb.js";
 import { commandExplore } from "./command_explore.js";
 import { commandCatch } from "./command_catch.js";
 import { commandInspect } from "./command_inspect.js";
+import { commandPokedex } from "./command_pokedex.js";
 import { PokeAPI, Pokemon } from "./pokeapi.js";
 import { stat } from "fs/promises";
 
@@ -73,6 +74,13 @@ export function getCommands(): Record<string, CLICommand> {
       description: "Inspects a pokemon registered in your pokedex",
       callback: async (state: State, ...args: string[]): Promise<void> => {
         commandInspect(state, ...args);
+      },
+    },
+    pokedex: {
+      name: "pokedex",
+      description: "Lists all the pokemon registered in your pokedex",
+      callback: async (state: State): Promise<void> => {
+        commandPokedex(state);
       },
     },
   };
